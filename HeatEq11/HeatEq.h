@@ -4,6 +4,9 @@
 #define _HeatEq_h
 
 #include <iostream>
+#include <iomanip>
+#include "Utilities.h"
+#include <fstream>
 
 //#define MAXSIZE 100000
 
@@ -37,31 +40,10 @@ private:
 	
 
 public:
-	HeatEq(int n, int m, double x_start, double x_finish, double t_start, double t_finish) {
-		this->n = n;
-		this->m = m;
-		this->x_start = x_start;
-		this->x_finish = x_finish;
-		this->t_start = t_start;
-		this->t_finish = t_finish;
 
-		this->h = (x_finish - x_start) / n;
-		this->tau = (t_finish - t_start) / m;
-
-		this->A = (9.0 * tau) / pow(h, 2);
-		this->B = (9.0 * tau) / pow(h, 2);
-		this->C = 1.0 + (18.0 * tau)/pow(h, 2);
-		this->kappa1 = -1.0;
-		this->kappa2 = 1.0 / (1.0 + 7.0*h);
-		this->mu1 = 0;
-		this->mu2 = (2*h) / (1.0  + 7.0*h);
-		this->phi_arr = new double[n - 2];
-		this->TMsolutions = new double[n];
-
-		this->layer = new double[n + 1];
-		this->layer_counter = 0;
-
-	}
+	HeatEq();
+	HeatEq(double x_start, double x_finish, double t_start, double t_finish, int n, int m);
+	void ReCreate();
 
 	//Set&Get methods
 	int Getn(); //return n
@@ -74,6 +56,13 @@ public:
 	double GetC(); //return C
 	double GetKappa1(); //return kappa1
 	double GetKappa2(); //return kappa2
+
+	void Setx_start(double val) { x_start = val; }
+	void Setx_finish(double val) { x_finish = val; }
+	void Sett_start(double val) { t_start = val; }
+	void Sett_finish(double val) { t_finish = val; }
+	void Setn(int val) { n = val; }
+	void Setm(int val) { m = val; };
 
 	//Tridiagonal matrix algorithm
 	void TridiagMatrix(double* A_arr, double* B_arr, double* C_arr, double kappa1, double kappa2, 

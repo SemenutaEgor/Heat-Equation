@@ -2,6 +2,76 @@
 
 #include "HeatEq.h"
 
+HeatEq::HeatEq() {
+	this->n = 0;
+	this->m = 0;
+	this->x_start = 0;
+	this->x_finish = 0;
+	this->t_start = 0;
+	this->t_finish = 0;
+
+	this->h = 0;
+	this->tau = 0;
+
+	this->A = 0;
+	this->B = 0;
+	this->C = 0;
+	this->kappa1 = 0;
+	this->kappa2 = 0;
+	this->mu1 = 0;
+	this->mu2 = 0;
+	this->phi_arr = new double[0];
+	this->TMsolutions = new double[0];
+
+	this->layer = new double[0];
+	this->layer_counter = 0;
+
+}
+
+HeatEq::HeatEq(double x_start, double x_finish, double t_start, double t_finish, int n, int m) {
+	this->n = n;
+	this->m = m;
+	this->x_start = x_start;
+	this->x_finish = x_finish;
+	this->t_start = t_start;
+	this->t_finish = t_finish;
+
+	this->h = (x_finish - x_start) / n;
+	this->tau = (t_finish - t_start) / m;
+
+	this->A = (9.0 * tau) / pow(h, 2);
+	this->B = (9.0 * tau) / pow(h, 2);
+	this->C = 1.0 + (18.0 * tau) / pow(h, 2);
+	this->kappa1 = -1.0;
+	this->kappa2 = 1.0 / (1.0 + 7.0 * h);
+	this->mu1 = 0;
+	this->mu2 = (2 * h) / (1.0 + 7.0 * h);
+	this->phi_arr = new double[n - 2];
+	this->TMsolutions = new double[n];
+
+	this->layer = new double[n + 1];
+	this->layer_counter = 0;
+
+}
+
+void HeatEq::ReCreate() {
+	h = (x_finish - x_start) / n;
+	tau = (t_finish - t_start) / m;
+
+	A = (9.0 * tau) / pow(h, 2);
+	B = (9.0 * tau) / pow(h, 2);
+	C = 1.0 + (18.0 * tau) / pow(h, 2);
+	kappa1 = -1.0;
+	kappa2 = 1.0 / (1.0 + 7.0 * h);
+	mu1 = 0;
+	mu2 = (2 * h) / (1.0 + 7.0 * h);
+	phi_arr = new double[n - 2];
+	TMsolutions = new double[n];
+
+	layer = new double[n + 1];
+	layer_counter = 0;
+}
+
 int HeatEq::Getn() {
 	return n;
 }
@@ -41,6 +111,7 @@ double HeatEq::GetKappa1() {
 double HeatEq::GetKappa2() {
 	return kappa2;
 }
+
 
 void HeatEq::TridiagMatrix(double* A_arr, double* B_arr, double* C_arr, double kappa1, double kappa2, double mu1, double mu2, double* phi_arr, int size_arr)
 {
@@ -132,9 +203,13 @@ void HeatEq::PrintTMSolutions() {
 }
 
 void HeatEq::PrintLastLayer() {
+	ofstream out;
+	out.open("grid.txt", std::ios::app);  
 	for (int i = 0; i < n + 1; i++) {
-		cout << "v[" << i << "," << layer_counter << "] = " << layer[i] << endl;
-	}
+		out << "v[" << i << "," << layer_counter << "] = " << layer[i] << setw(10);
+	}            
+	out << endl;
+	out.close();
 }
 
 void HeatEq::PrintMatrix() {
