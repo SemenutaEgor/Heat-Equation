@@ -46,6 +46,8 @@ public:
 	void ReCreate();
 
 	//Set&Get methods
+	double Getx_start();
+	double Gett_start();
 	int Getn(); //return n
 	int Getm(); //return m
 	double Geth(); //return h

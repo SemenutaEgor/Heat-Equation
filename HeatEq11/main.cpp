@@ -5,6 +5,7 @@
 #include <conio.h>
 #include <string>
 #include <iostream>
+#include <sstream>
 
 using namespace std;
 
@@ -18,22 +19,22 @@ void Menu(HeatEq Eq) {
 			//gotoxy(0, 1);
 			int n, m;
 			double x0, xn, t0, tn;
-			cout << "enter x0: ";
+			cout << "¬ведите x0: ";
 			cin >> x0;
 			Eq.Setx_start(x0);
-			cout << "enter xn: ";
+			cout << "¬ведите xn: ";
 			cin >> xn;
 			Eq.Setx_finish(xn);
-			cout << "enter t0: ";
+			cout << "¬ведите t0: ";
 			cin >> t0;
 			Eq.Sett_start(t0);
-			cout << "enter tn: ";
+			cout << "¬ведите tn: ";
 			cin >> tn;
 			Eq.Sett_finish(tn);
-			cout << "enter n: ";
+			cout << "¬ведите n: ";
 			cin >> n;
 			Eq.Setn(n);
-			cout << "enter m: ";
+			cout << "¬ведите m: ";
 			cin >> m;
 			Eq.Setm(m);
 
@@ -49,9 +50,53 @@ void Menu(HeatEq Eq) {
 			}
 		}
 
+		if (com == "temp") {
+			double x, t;
+			cout << "¬едите x: ";
+			cin >> x;
+			int xcounter = 0;
+			while (fmod(x, 1.0) != 0) {
+				xcounter++;
+				x *= 10;
+			}
+
+			int valn = pow(10, xcounter);
+			if (valn <= 100) {
+				Eq.Setn(100);
+			}
+			else {
+				Eq.Setn(valn);
+			}
+
+			cout << "¬ведите t: ";
+			cin >> t;
+			int tcounter = 0;
+			while (fmod(t, 1.0) != 0) {
+				tcounter++;
+				t *= 10;
+			}
+			int valm = pow(10, tcounter);
+			if (valm <= 1000) {
+				Eq.Setn(1000);
+			}
+			else {
+				Eq.Setn(valm);
+			}
+
+			Eq.ReCreate();
+
+			int xindex = (x - Eq.Getx_start()) / Eq.Geth();
+			int tindex = (t - Eq.Gett_start()) / Eq.Gettau();
+
+			double value;
+			value = Eq.GetTemperature(xindex, tindex); //дописать функцию, котора€ будет просчитывать эту 
+			                                           //новую сетку до нужного значени€ и возвр€щать его.
+		}
+
 		if (com == "help") {
 			cout << "create - ввод новых параметров дл€ уравнени€" << endl;
 			cout << "solve - узнать температуру во всех узлах сетки" << endl;
+			cout << "temp - узнать температуру в конкретной точке" << endl;
 			cout << "exit - exit" << endl;
 		}
 	} while (com != "exit");

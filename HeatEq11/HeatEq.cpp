@@ -72,6 +72,14 @@ void HeatEq::ReCreate() {
 	layer_counter = 0;
 }
 
+double HeatEq::Getx_start() {
+	return x_start;
+}
+
+double HeatEq::Gett_start() {
+	return t_start;
+}
+
 int HeatEq::Getn() {
 	return n;
 }
