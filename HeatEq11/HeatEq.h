@@ -5,7 +5,7 @@
 
 #include <iostream>
 
-#define MAXSIZE 100000
+//#define MAXSIZE 100000
 
 using namespace std;
 
@@ -19,23 +19,67 @@ private:
 	double t_finish; // finish time
 	int n; // number of segments along x
 	int m; // number of segments along t
+	double h; //step along x
+	double tau; //step along t
+	double* layer; //array for layers
+	int layer_counter; //counter of layers
 
 	//for tridiagonal matrix algorithm
-	double *A_arr = new double[MAXSIZE]; //array of coefficients A
-	double *B_arr = new double[MAXSIZE]; //array of coefficients B
-	double *C_arr = new double[MAXSIZE]; //array of coefficients C
+	double A; //coefficient A
+	double B; //coefficient B
+	double C; //coefficient C
 	double kappa1; //coefficient kappa1
 	double kappa2; //coefficient kappa2
 	double mu1; //coefficient mu1
 	double mu2; // coefficient mu2
-	double *phi_arr = new double[MAXSIZE]; //array for coefficients phi
+	double* phi_arr; //array for coefficients phi
+	double* TMsolutions; //array for solutions
 	
 
 public:
-	//static double* solutions = new double[MAXSIZE]; //array for solutions
+	HeatEq(int n, int m, double x_start, double x_finish, double t_start, double t_finish) {
+		this->n = n;
+		this->m = m;
+		this->x_start = x_start;
+		this->x_finish = x_finish;
+		this->t_start = t_start;
+		this->t_finish = t_finish;
 
-	void TriagMatrix(double* A_arr, double* B_arr, double* C_arr, double kappa1, double kappa2, double mu1, double mu2, double* phi_arr, int size_arr);
-	//static void PrintSolutions();
+		this->h = (x_finish - x_start) / n;
+		this->tau = (t_finish - t_start) / m;
+
+		this->A = 0;
+		this->B = 0;
+		this->C = 0;
+		this->kappa1 = 0;
+		this->kappa2 = 0;
+		this->mu1 = 0;
+		this->mu2 = 0;
+		this->phi_arr = new double[n - 2];
+		this->TMsolutions = new double[n];
+
+		this->layer = new double[n + 1];
+		this->layer_counter = 0;
+
+	}
+
+	//Set&Get methods
+	int Getn(); //return n
+	int Getm(); //return m
+	int Geth(); //return h
+	int Gettau(); //return tau
+
+
+	//Tridiagonal matrix algorithm
+	void TridiagMatrix(double* A_arr, double* B_arr, double* C_arr, double kappa1, double kappa2, 
+		double mu1, double mu2, double* phi_arr, int size_arr);
+
+	//Heat Equation methods
+	void ZeroLayer(); //zero layer calculation
+	
+	//Output methods
+	void PrintTMSolutions(); //print solutions of tridiagonal matrix algorithm
+	void PrintLayer();
 
 };
 
