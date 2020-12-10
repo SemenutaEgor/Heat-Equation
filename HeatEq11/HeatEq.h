@@ -48,13 +48,13 @@ public:
 		this->h = (x_finish - x_start) / n;
 		this->tau = (t_finish - t_start) / m;
 
-		this->A = 0;
-		this->B = 0;
-		this->C = 0;
-		this->kappa1 = 0;
-		this->kappa2 = 0;
+		this->A = (9.0 * tau) / pow(h, 2);
+		this->B = (9.0 * tau) / pow(h, 2);
+		this->C = 1.0 + (18.0 * tau)/pow(h, 2);
+		this->kappa1 = -1.0;
+		this->kappa2 = 1.0 / (1.0 + 7.0*h);
 		this->mu1 = 0;
-		this->mu2 = 0;
+		this->mu2 = (2*h) / (1.0  + 7.0*h);
 		this->phi_arr = new double[n - 2];
 		this->TMsolutions = new double[n];
 
@@ -66,9 +66,14 @@ public:
 	//Set&Get methods
 	int Getn(); //return n
 	int Getm(); //return m
-	int Geth(); //return h
-	int Gettau(); //return tau
-
+	double Geth(); //return h
+	double Gettau(); //return tau
+	int Getlayer_counter(); //return layer_counter (number if layers)
+	double GetA(); //return A
+	double GetB(); //return B
+	double GetC(); //return C
+	double GetKappa1(); //return kappa1
+	double GetKappa2(); //return kappa2
 
 	//Tridiagonal matrix algorithm
 	void TridiagMatrix(double* A_arr, double* B_arr, double* C_arr, double kappa1, double kappa2, 
@@ -76,10 +81,12 @@ public:
 
 	//Heat Equation methods
 	void ZeroLayer(); //zero layer calculation
+	void NextLayer(); //next layer calculation
 	
 	//Output methods
 	void PrintTMSolutions(); //print solutions of tridiagonal matrix algorithm
-	void PrintLayer();
+	void PrintLastLayer(); //print last layer
+	void PrintMatrix(); //print tridiadonal matrix for last layer
 
 };
 
