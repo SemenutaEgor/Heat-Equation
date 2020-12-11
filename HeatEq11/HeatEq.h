@@ -42,12 +42,14 @@ private:
 public:
 
 	HeatEq();
-	HeatEq(double x_start, double x_finish, double t_start, double t_finish, int n, int m);
+	HeatEq(int n, int m);
 	void ReCreate();
 
 	//Set&Get methods
 	double Getx_start();
 	double Gett_start();
+	double Getx_finish();
+	double Gett_finish();
 	int Getn(); //return n
 	int Getm(); //return m
 	double Geth(); //return h
@@ -73,10 +75,12 @@ public:
 	//Heat Equation methods
 	void ZeroLayer(); //zero layer calculation
 	void NextLayer(); //next layer calculation
+	double GetTemperature(double x, double t); //return temperature on defined states
 	
 	//Output methods
 	void PrintTMSolutions(); //print solutions of tridiagonal matrix algorithm
-	void PrintLastLayer(); //print last layer
+	void PrintLastLayerToFile(); //print last layer into file
+	void PrintLastLayer(); //print last layer into console
 	void PrintMatrix(); //print tridiadonal matrix for last layer
 
 };

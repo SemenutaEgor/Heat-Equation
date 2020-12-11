@@ -6,9 +6,9 @@ HeatEq::HeatEq() {
 	this->n = 0;
 	this->m = 0;
 	this->x_start = 0;
-	this->x_finish = 0;
+	this->x_finish = 1;
 	this->t_start = 0;
-	this->t_finish = 0;
+	this->t_finish = 1000;
 
 	this->h = 0;
 	this->tau = 0;
@@ -28,13 +28,13 @@ HeatEq::HeatEq() {
 
 }
 
-HeatEq::HeatEq(double x_start, double x_finish, double t_start, double t_finish, int n, int m) {
+HeatEq::HeatEq(int n, int m) {
 	this->n = n;
 	this->m = m;
-	this->x_start = x_start;
-	this->x_finish = x_finish;
-	this->t_start = t_start;
-	this->t_finish = t_finish;
+	this->x_start = 0;
+	this->x_finish = 1;
+	this->t_start = 0;
+	this->t_finish = 1000;
 
 	this->h = (x_finish - x_start) / n;
 	this->tau = (t_finish - t_start) / m;
@@ -78,6 +78,14 @@ double HeatEq::Getx_start() {
 
 double HeatEq::Gett_start() {
 	return t_start;
+}
+
+double HeatEq::Getx_finish() {
+	return x_finish;
+}
+
+double HeatEq::Gett_finish() {
+	return t_finish;
 }
 
 int HeatEq::Getn() {
@@ -203,6 +211,23 @@ void HeatEq::NextLayer() {
 	layer_counter++;
 }
 
+double HeatEq::GetTemperature(double x, double t) {
+	int xindex = (x - x_start) / h;
+	int tindex = (t - t_start) / tau;
+
+	//cout << "xindex = " << xindex << endl;
+	//cout << "tindex = " << tindex << endl;
+
+	ZeroLayer();
+	//cout << "Посчитал " << layer_counter << " слой" << endl;
+	for (int i = 1; i <= tindex; i++) {
+		NextLayer();
+		//cout << "Посчитал " << layer_counter << " слой" << endl;
+	}
+
+	return layer[xindex];
+}
+
 
 void HeatEq::PrintTMSolutions() {
 	for (int i = 0; i < n; i++) {
@@ -210,7 +235,7 @@ void HeatEq::PrintTMSolutions() {
 	}
 }
 
-void HeatEq::PrintLastLayer() {
+void HeatEq::PrintLastLayerToFile() {
 	ofstream out;
 	out.open("grid.txt", std::ios::app);  
 	for (int i = 0; i < n + 1; i++) {
@@ -218,6 +243,13 @@ void HeatEq::PrintLastLayer() {
 	}            
 	out << endl;
 	out.close();
+}
+
+void HeatEq::PrintLastLayer() {
+	for (int i = 0; i < n + 1; i++) {
+		cout << "v[" << i << "," << layer_counter << "] = " << layer[i] << setw(10);
+	}
+	cout << endl;
 }
 
 void HeatEq::PrintMatrix() {

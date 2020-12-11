@@ -14,23 +14,10 @@ void Menu(HeatEq Eq) {
 	do {
 		cout << "Введите 'help' для, чтобы появился список команд" << endl;
 		cin >> com;
-		if (com == "create") {
+		if (com == "initial") {
 			//clrscr();
 			//gotoxy(0, 1);
 			int n, m;
-			double x0, xn, t0, tn;
-			cout << "Введите x0: ";
-			cin >> x0;
-			Eq.Setx_start(x0);
-			cout << "Введите xn: ";
-			cin >> xn;
-			Eq.Setx_finish(xn);
-			cout << "Введите t0: ";
-			cin >> t0;
-			Eq.Sett_start(t0);
-			cout << "Введите tn: ";
-			cin >> tn;
-			Eq.Sett_finish(tn);
 			cout << "Введите n: ";
 			cin >> n;
 			Eq.Setn(n);
@@ -41,62 +28,162 @@ void Menu(HeatEq Eq) {
 			Eq.ReCreate();
 		}
 
+		if (com == "info") {
+			cout << "Вариант 4" << endl;
+			cout << "Уравнение тепопроводности: du/dt = 9 * d^2u/dx^2 + 5*sin(t)" << endl;
+			cout << "x принадлежит отрезку [0,1], t принадлежит отрезку [0, 1000]" << endl;
+			cout << "Начальные условия: u(x, 0) = 1 - x^2" << endl;
+			cout << "Граничные условия слева (второго рода): du/dx(0, t) = 0" << endl;
+			cout << "Граничные условия справа (третьего рода): -du/dx(1, t) = 7 * (u(1, t) - 2/7)" << endl;
+			cout << "Неявная разностная схема:" << endl;
+			cout << "(9*tau/h^2) * v[i-1, j+1] + (9*tau/h^2) * v[i+1, j+1] - (1 + 18*tau/h^2) * v[i, j+1] = - (5*tau*sin(t) + v[i, j])" << endl;
+			cout << "i = 1, ... , n-1;     j = 1, ..., m" << endl;
+			cout << "v[i, 0] = 1 - x^2,    i = 0, ..., n" << endl;
+			cout << "(v[1, j+1] - v[0, j+1])/h = 0,    j = 1, ..., m" << endl;
+			cout << "-(v[n, j+1] - v[n-1, j+1])/h = 7 * (v[n, j+1] - 2/7),    j = 1, ..., m" << endl;
+			cout << endl;
+			cout << "x0 = " << Eq.Getx_start() << endl;
+			cout << "xn = " << Eq.Getx_finish() << endl;
+			cout << "t0 = " << Eq.Gett_start() << endl;
+			cout << "tn = " << Eq.Gett_finish() << endl;
+			cout << "h = " << Eq.Geth() << endl;
+			cout << "tau = " << Eq.Gettau() << endl;/*
+			cout << "Матрица прогонки для последнего посчитанного слоя" << endl;
+			Eq.PrintMatrix();*/
+		}
+
 		if (com == "solve") {
 			Eq.ZeroLayer();
-			Eq.PrintLastLayer();
+			Eq.PrintLastLayerToFile();
 			for (int i = 1; i <= Eq.Getm(); i++) {
 				Eq.NextLayer();
-				Eq.PrintLastLayer();
+				Eq.PrintLastLayerToFile();
 			}
 		}
 
 		if (com == "temp") {
-			double x, t;
-			cout << "Ведите x: ";
-			cin >> x;
-			int xcounter = 0;
-			while (fmod(x, 1.0) != 0) {
-				xcounter++;
-				x *= 10;
+			double x = -1;
+			double t = -1;
+			string strx, strt;
+			while ((x < 0) || (x > 1)) {
+				cout << "Ведите x (от 0 до 1): ";
+				cin >> x;
 			}
 
-			int valn = pow(10, xcounter);
-			if (valn <= 100) {
-				Eq.Setn(100);
+			while ((t < 0) || (t > 1000)) {
+				cout << "Ведите t (от 0 до 1000): ";
+				cin >> t;
+			}
+
+			strx = to_string(x);
+			//cout << "strx = " << strx << endl;
+			int xcounter = 0;
+			for (int i = strx.length()-1; i >= 0; i--) {
+				//cout << "str[" << i << "] = " << strx[i] << endl;
+				if (strx[i] == ',') {
+					break;
+				}
+				else {
+					if (strx[i] != '0') {
+						xcounter++;
+					}
+				}
+			}
+			/*cout << "xcounter = " << xcounter << endl;*/
+
+			strt = to_string(t);
+			//cout << "strx = " << strx << endl;
+			int tcounter = 0;
+			for (int i = strt.length() - 1; i >= 0; i--) {
+				//cout << "str[" << i << "] = " << strx[i] << endl;
+				if (strt[i] == ',') {
+					break;
+				}
+				else {
+					if (strt[i] != '0') {
+						tcounter++;
+					}
+				}
+			}
+			/*cout << "tcounter = " << tcounter << endl;*/
+		
+
+			double valn = pow(10, xcounter);
+			if (valn <= 1000) {
+				Eq.Setn(1000);
 			}
 			else {
 				Eq.Setn(valn);
 			}
 
-			cout << "Введите t: ";
-			cin >> t;
-			int tcounter = 0;
-			while (fmod(t, 1.0) != 0) {
-				tcounter++;
-				t *= 10;
-			}
-			int valm = pow(10, tcounter);
+			double valm = 1000 * pow(10, tcounter);
 			if (valm <= 1000) {
-				Eq.Setn(1000);
+				Eq.Setm(1000);
 			}
 			else {
-				Eq.Setn(valm);
+				Eq.Setm(valm);
+				cout << "valm = " << valm << endl;
 			}
+
+			//calculate temperature
 
 			Eq.ReCreate();
 
-			int xindex = (x - Eq.Getx_start()) / Eq.Geth();
-			int tindex = (t - Eq.Gett_start()) / Eq.Gettau();
+			double temp;
+			temp = Eq.GetTemperature(x, t); 
 
-			double value;
-			value = Eq.GetTemperature(xindex, tindex); //дописать функцию, которая будет просчитывать эту 
-			                                           //новую сетку до нужного значения и возврящать его.
+			cout << "v(" << x << "," << t << ") = " << temp << endl;
+		}
+
+		if (com == "h") {
+			cout << "h = " << Eq.Geth() << endl;
+		}
+
+		if (com == "tau") {
+			cout << "tau = " << Eq.Gettau() << endl;
+		}
+
+		if (com == "n") {
+			cout << "n = " << Eq.Getn() << endl;
+		}
+
+		if (com == "m") {
+			cout << "m = " << Eq.Getm() << endl;
+		}
+
+		if (com == "matrix") {
+			Eq.PrintMatrix();
+		}
+
+		if (com == "layer") {
+			int num;
+			cout << "Введите номер слоя: ";
+			cin >> num;
+			Eq.ZeroLayer();
+			if (num == 0) {
+				Eq.PrintLastLayer();
+			}
+			else {
+				for (int i = 1; i <= num; i++) {
+					Eq.NextLayer();
+					//cout << "Посчитал " << layer_counter << " слой" << endl;
+				}
+				Eq.PrintLastLayer();
+			}
 		}
 
 		if (com == "help") {
-			cout << "create - ввод новых параметров для уравнения" << endl;
+			cout << endl;
+			cout << "initial - ввод новых параметров для уравнения" << endl;
+			cout << "info - узнать все параметры" << endl;
 			cout << "solve - узнать температуру во всех узлах сетки" << endl;
 			cout << "temp - узнать температуру в конкретной точке" << endl;
+			cout << "layer - вывести на экран какой-то слой" << endl;
+			cout << "h - узнать шаг h по x" << endl;
+			cout << "tau - узнать шаг tau по t" << endl;
+			cout << "n - узнать количество узлов n по x" << endl;
+			cout << "m - узнать количество узлов m по t" << endl;/*
+			cout << "matrix - напечатать матрицу прогонки (для последнего посчитанного слоя)" << endl;*/
 			cout << "exit - exit" << endl;
 		}
 	} while (com != "exit");
