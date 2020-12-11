@@ -6,6 +6,10 @@
 #include <string>
 #include <iostream>
 #include <sstream>
+#include <windows.h>
+
+
+
 
 using namespace std;
 
@@ -157,7 +161,7 @@ void Menu(HeatEq Eq) {
 
 		if (com == "layer") {
 			int num;
-			cout << "Введите номер слоя: ";
+			cout << "Введите номер слоя от 0 до " << Eq.Getm() << ": ";
 			cin >> num;
 			Eq.ZeroLayer();
 			if (num == 0) {
@@ -176,9 +180,9 @@ void Menu(HeatEq Eq) {
 			cout << endl;
 			cout << "initial - ввод новых параметров для уравнения" << endl;
 			cout << "info - узнать все параметры" << endl;
-			cout << "solve - узнать температуру во всех узлах сетки" << endl;
+			cout << "solve - узнать температуру во всех узлах сетки (только после initial)" << endl;
 			cout << "temp - узнать температуру в конкретной точке" << endl;
-			cout << "layer - вывести на экран какой-то слой" << endl;
+			cout << "layer - вывести на экран какой-то слой (только после initial)" << endl;
 			cout << "h - узнать шаг h по x" << endl;
 			cout << "tau - узнать шаг tau по t" << endl;
 			cout << "n - узнать количество узлов n по x" << endl;
@@ -190,6 +194,7 @@ void Menu(HeatEq Eq) {
 }
 
 int main() {
+	system("title Задача 10 Неявная разностная схема для нестационарного уравнения теплопроводности");
 	setlocale(LC_ALL, "Russian");
 	//double A[1] = {1.0};
 	//double B[1] = {2.0};
