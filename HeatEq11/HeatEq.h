@@ -7,6 +7,7 @@
 #include <iomanip>
 #include "Utilities.h"
 #include <fstream>
+#include "StreamTable.h"
 
 //#define MAXSIZE 100000
 
@@ -25,7 +26,7 @@ private:
 	double h; //step along x
 	double tau; //step along t
 	double* layer; //array for layers
-	int layer_counter; //counter of layers
+	double layer_counter; //counter of layers
 
 	//for tridiagonal matrix algorithm
 	double A; //coefficient A
@@ -60,6 +61,7 @@ public:
 	double GetC(); //return C
 	double GetKappa1(); //return kappa1
 	double GetKappa2(); //return kappa2
+	double GetPhi(int i, int j); //calculate and return Phi[i][j]
 
 	void Setx_start(double val) { x_start = val; }
 	void Setx_finish(double val) { x_finish = val; }

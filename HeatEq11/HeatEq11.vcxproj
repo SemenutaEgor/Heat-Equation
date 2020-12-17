@@ -140,6 +140,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="HeatEq.h" />
+    <ClInclude Include="StreamTable.h" />
     <ClInclude Include="Utilities.h" />
   </ItemGroup>
   <ItemGroup>

@@ -42,7 +42,7 @@ HeatEq::HeatEq(int n, int m) {
 	this->A = (9.0 * tau) / pow(h, 2);
 	this->B = (9.0 * tau) / pow(h, 2);
 	this->C = 1.0 + (18.0 * tau) / pow(h, 2);
-	this->kappa1 = -1.0;
+	this->kappa1 = 1.0;
 	this->kappa2 = 1.0 / (1.0 + 7.0 * h);
 	this->mu1 = 0;
 	this->mu2 = (2 * h) / (1.0 + 7.0 * h);
@@ -61,7 +61,7 @@ void HeatEq::ReCreate() {
 	A = (9.0 * tau) / pow(h, 2);
 	B = (9.0 * tau) / pow(h, 2);
 	C = 1.0 + (18.0 * tau) / pow(h, 2);
-	kappa1 = -1.0;
+	kappa1 = 1.0;
 	kappa2 = 1.0 / (1.0 + 7.0 * h);
 	mu1 = 0;
 	mu2 = (2 * h) / (1.0 + 7.0 * h);
@@ -126,6 +126,12 @@ double HeatEq::GetKappa1() {
 
 double HeatEq::GetKappa2() {
 	return kappa2;
+}
+
+double HeatEq::GetPhi(int i, int j) {
+	double Phi;
+	Phi = 5 * tau * sin(t_start + j * tau) + layer[i];
+	return Phi;
 }
 
 
@@ -198,7 +204,7 @@ void HeatEq::NextLayer() {
 
 	for (int i = 0; i < n - 1; i++) {
 		alphas[i + 1] = B / (C - alphas[i] * A);
-		betas[i + 1] = ((5.0 * tau * sin(t_start + i * tau) + layer[i]) + betas[i] * A) / (C - alphas[i] * A);
+		betas[i + 1] = ((5.0 * tau * sin(t_start + ((layer_counter + 1) * tau)) + layer[i + 1]) + betas[i] * A) / (C - alphas[i] * A);
 	}
 
 	// back substitution
@@ -237,17 +243,23 @@ void HeatEq::PrintTMSolutions() {
 
 void HeatEq::PrintLastLayerToFile() {
 	ofstream out;
-	out.open("grid.txt", std::ios::app);  
+	out.open("grid.txt", std::ios::app);
+	out << fixed;
+	out.precision(15);
+	int layernum = layer_counter;
 	for (int i = 0; i < n + 1; i++) {
-		out << "v[" << i << "," << layer_counter << "] = " << layer[i] << setw(10);
+		out << "v[" << i << "," << layernum << "] = " << layer[i] << setw(10);
 	}            
 	out << endl;
 	out.close();
 }
 
 void HeatEq::PrintLastLayer() {
+	cout << fixed;
+	cout.precision(15);
+	int layernum = layer_counter;
 	for (int i = 0; i < n + 1; i++) {
-		cout << "v[" << i << "," << layer_counter << "] = " << layer[i] << setw(10);
+		cout << "v[" << i << "," << layernum << "] = " << layer[i] << setw(10);
 	}
 	cout << endl;
 }

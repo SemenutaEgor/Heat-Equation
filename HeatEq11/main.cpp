@@ -46,10 +46,10 @@ void Menu(HeatEq Eq) {
 			cout << "(v[1, j+1] - v[0, j+1])/h = 0,    j = 1, ..., m" << endl;
 			cout << "-(v[n, j+1] - v[n-1, j+1])/h = 7 * (v[n, j+1] - 2/7),    j = 1, ..., m" << endl;
 			cout << endl;
-			cout << "x0 = " << Eq.Getx_start() << endl;
-			cout << "xn = " << Eq.Getx_finish() << endl;
+			cout << "a = " << Eq.Getx_start() << endl;
+			cout << "b = " << Eq.Getx_finish() << endl;
 			cout << "t0 = " << Eq.Gett_start() << endl;
-			cout << "tn = " << Eq.Gett_finish() << endl;
+			cout << "T = " << Eq.Gett_finish() << endl;
 			cout << "h = " << Eq.Geth() << endl;
 			cout << "tau = " << Eq.Gettau() << endl;/*
 			cout << "Матрица прогонки для последнего посчитанного слоя" << endl;
@@ -194,7 +194,7 @@ void Menu(HeatEq Eq) {
 }
 
 int main() {
-	system("title Задача 10 Неявная разностная схема для нестационарного уравнения теплопроводности");
+	system("title Задача 10 Неявная разностная схема для нестационарного уравнения теплопроводности, Семенюта Е. Родионов П.");
 	setlocale(LC_ALL, "Russian");
 	//double A[1] = {1.0};
 	//double B[1] = {2.0};
