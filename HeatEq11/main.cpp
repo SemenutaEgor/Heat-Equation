@@ -92,6 +92,7 @@ void Menu(HeatEq Eq) {
 					out << "t = " << 0 << " ¬нутренних источников (стоков) тепла нет" << endl;
 				}
 			}
+			Eq.AverageTemperatureOnLayer();
 			for (int i = 1; i <= Eq.Getm(); i++) {
 				Eq.NextLayer();
 				Eq.TempCheckToFile();
@@ -109,6 +110,7 @@ void Menu(HeatEq Eq) {
 						out << "t = " << time << " ¬нутренних источников (стоков) тепла нет" << endl;
 					}
 				}
+				Eq.AverageTemperatureOnLayer();
 			}
 			out.close();
 		}
@@ -282,6 +284,10 @@ void Menu(HeatEq Eq) {
 			cout << "tau = " << Eq.Gettau() << endl;
 		}
 
+		if (com == "tempcont") {
+			//надо просчитать заново всю сетку и  на каждо слое брать значение  этой точке и его контролировать
+		}
+
 
 		if (com == "help") {
 			cout << endl;
@@ -292,6 +298,7 @@ void Menu(HeatEq Eq) {
 			cout << "¬ывести какой-то слой                                         " << ": layer" << " (только после initial)" << endl;
 			cout << "¬ывести плотность источников (стоков) тепла в момент времени t" << ": heatsourse" << " (только после initial)" << endl;
 			cout << "”величить точность (уменьшить оценку погрешности)             " << ": concretion" << " (только после initial)" << endl;
+			//cout << " ак мен€лась температура в какой-то точке x?                  " << ": tempcont" << " (только после initial)" << endl;
 			cout << "”знать шаг h по x                                             " << ": h" << endl;
 			cout << "”знать шаг tau по t                                           " << ": tau" << endl;
 			cout << "”знать количество узлов n по x                                " << ": n" << endl;

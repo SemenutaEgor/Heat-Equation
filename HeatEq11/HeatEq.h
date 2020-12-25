@@ -95,6 +95,7 @@ public:
 	double HeatSource(double t); // return heat source density at time t
 	//void HeatSourcesInTime(); // return heat source density at time t
 	//void TemperatureChanges(); // monitors temperature changes on the rod over a certain period of time
+	void AverageTemperatureOnLayer(); //describes the change in temperature at some point
 	
 	//Output methods
 	void PrintTMSolutions(); //print solutions of tridiagonal matrix algorithm

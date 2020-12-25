@@ -352,6 +352,20 @@ double HeatEq::HeatSource(double time) {
 	return 5 * sin(time);
 }
 
+void HeatEq::AverageTemperatureOnLayer() {
+	ofstream out;
+	out.open("AverageTemperature.txt", std::ios::app);
+	double temperature;
+	double average_temperature;
+	temperature = 0;
+	for (int i = 0; i <= n; i++) {
+		temperature += layer[i];
+	}
+	average_temperature = temperature / n;
+	out << "Средняя температура на слое " << layer_counter << " = "<< average_temperature << endl;
+	out.close();
+}
+
 //void HeatEq::HeatSourcesInTime() {
 //	ofstream out;
 //	out.open("HeatSourcesInTime.txt", std::ios::app);
