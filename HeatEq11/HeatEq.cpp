@@ -188,6 +188,90 @@ void HeatEq::TridiagMatrix(double* A_arr, double* B_arr, double* C_arr, double k
 	//	}
 }
 
+void HeatEq::TempCheckToFile() {
+	ofstream out;
+	out.open("TemperatureControl.txt", std::ios::app);
+	int layernum = layer_counter;
+	for (int i = 0; i <= n; i++) {
+		if (layer[i] < min_temp) {
+			out << "Стержень переохладился в точке " << "v[" << i << "," << layernum << "], его температура = " << scientific << layer[i] << endl;
+		}
+		if (layer[i] > max_temp) {
+			out << "Стержень перегрелся в точке " << "v[" << i << "," << layernum << "], его температура = " << scientific << layer[i] << endl;
+		}
+	}
+	out.close();
+}
+
+int HeatEq::TempCheck(double temp, int index) {
+	int layernum = layer_counter;
+	if (temp < min_temp) {
+		cout << "Стержень переохладился в точке " << "v[" << index << "," << layernum <<"], его температура = " << scientific << temp << endl;
+		string ch;
+		do {
+			cout << "Продолжить?(y/n)";
+			cin >> ch;
+			if (ch == "n") {
+				return -1;
+			}
+		} while (ch != "y");
+	}
+	if (temp > max_temp) {
+		cout << "Стержень перегрелся в точке " << "v[" << index << "," << layernum << "], его температура = " << scientific << temp << endl;
+		string ch;
+		do {
+			cout << "Продолжить?(y/n)";
+			cin >> ch;
+			if (ch == "n") {
+				return -1;
+			}
+		} while (ch != "y");
+	}
+	else
+		return 0;
+}
+
+int HeatEq::CheckedZeroLayer() {
+	for (int i = 0; i < n + 1; i++) {
+		layer[i] = 1 - pow((x_start + i * h), 2);
+		if (TempCheck(layer[i], i) == -1) {
+			return -1;
+		}
+	}
+	return 0;
+}
+
+int HeatEq::CheckedNextLayer() {
+	layer_counter++;
+	double* alphas = new double[n];
+	double* betas = new double[n];
+
+	// forward sweep
+	alphas[0] = kappa1;
+	betas[0] = mu1;
+
+	for (int i = 0; i < n - 1; i++) {
+		alphas[i + 1] = B / (C - alphas[i] * A);
+		betas[i + 1] = ((5.0 * tau * sin(t_start + ((layer_counter + 1) * tau)) + layer[i + 1]) + betas[i] * A) / (C - alphas[i] * A);
+	}
+
+	// back substitution
+	layer[n] = (mu2 + kappa2 * betas[n - 1]) / (1 - kappa2 * alphas[n - 1]);
+	if (TempCheck(layer[n], n) == -1) {
+		return -1;
+	}
+
+	for (int i = n - 1; i >= 0; i--) {
+		layer[i] = alphas[i] * layer[i + 1] + betas[i];
+		if (TempCheck(layer[i], i) == -1) {
+			return -1;
+		}
+	}
+
+	/*layer_counter++;*/
+	return 0;
+}
+
 void HeatEq::ZeroLayer() {
 	for (int i = 0; i < n + 1; i++) {
 		layer[i] = 1 - pow((x_start + i * h), 2);
@@ -234,6 +318,30 @@ double HeatEq::GetTemperature(double x, double t) {
 	return layer[xindex];
 }
 
+double HeatEq::HeatSource(double time) {
+	return 5 * sin(time);
+}
+
+//void HeatEq::HeatSourcesInTime() {
+//	ofstream out;
+//	out.open("HeatSourcesInTime.txt", std::ios::app);
+//
+//	for ()
+//
+//	heat_density = Eq.HeatSource(time);
+//	if (heat_density < 0) {
+//		cout << "Плотность стоков тепла: " << heat_density << endl;
+//	}
+//	else {
+//		if (heat_density > 0) {
+//			cout << "Плотность источников тепла: " << heat_density << endl;
+//		}
+//		else {
+//			cout << "Источников (стоков) тепла нет" << endl;
+//		}
+//	}
+//}
+
 
 void HeatEq::PrintTMSolutions() {
 	for (int i = 0; i < n; i++) {
@@ -243,12 +351,12 @@ void HeatEq::PrintTMSolutions() {
 
 void HeatEq::PrintLastLayerToFile() {
 	ofstream out;
-	out.open("grid.txt", std::ios::app);
+	out.open("Grid.txt", std::ios::app);
 	out << fixed;
 	out.precision(15);
 	int layernum = layer_counter;
 	for (int i = 0; i < n + 1; i++) {
-		out << "v[" << i << "," << layernum << "] = " << layer[i] << setw(10);
+		out <<  "v[" << i << "," << layernum << "] = " << scientific << layer[i] << setw(10);
 	}            
 	out << endl;
 	out.close();
@@ -259,7 +367,7 @@ void HeatEq::PrintLastLayer() {
 	cout.precision(15);
 	int layernum = layer_counter;
 	for (int i = 0; i < n + 1; i++) {
-		cout << "v[" << i << "," << layernum << "] = " << layer[i] << setw(10);
+		cout << "v[" << i << "," << layernum << "] = " << scientific << layer[i] << setw(10);
 	}
 	cout << endl;
 }

@@ -8,9 +8,6 @@
 #include <sstream>
 #include <windows.h>
 
-
-
-
 using namespace std;
 
 void Menu(HeatEq Eq) {
@@ -22,12 +19,22 @@ void Menu(HeatEq Eq) {
 			//clrscr();
 			//gotoxy(0, 1);
 			int n, m;
-			cout << "Введите n: ";
+			double tf, mint, maxt;
+			cout << "Введите T - конечное время: ";
+			cin >> tf;
+			Eq.Sett_finish(tf);
+			cout << "Введите n - количество узлов по x: ";
 			cin >> n;
 			Eq.Setn(n);
-			cout << "Введите m: ";
+			cout << "Введите m - количество слоёв: ";
 			cin >> m;
 			Eq.Setm(m);
+			cout << "Введите температуру переохлаждения стержня: ";
+			cin >> mint;
+			Eq.Setmin_temp(mint);
+			cout << "Введите температуру перегрева стержня: ";
+			cin >> maxt;
+			Eq.Setmax_temp(maxt);
 
 			Eq.ReCreate();
 		}
@@ -46,23 +53,56 @@ void Menu(HeatEq Eq) {
 			cout << "(v[1, j+1] - v[0, j+1])/h = 0,    j = 1, ..., m" << endl;
 			cout << "-(v[n, j+1] - v[n-1, j+1])/h = 7 * (v[n, j+1] - 2/7),    j = 1, ..., m" << endl;
 			cout << endl;
-			cout << "a = " << Eq.Getx_start() << endl;
-			cout << "b = " << Eq.Getx_finish() << endl;
-			cout << "t0 = " << Eq.Gett_start() << endl;
-			cout << "T = " << Eq.Gett_finish() << endl;
-			cout << "h = " << Eq.Geth() << endl;
-			cout << "tau = " << Eq.Gettau() << endl;/*
+			cout << "a = " << Eq.Getx_start() << " - начало отрезка по x" <<endl;
+			cout << "b = " << Eq.Getx_finish() << " - конец отрезка по x" << endl;
+			cout << "t0 = " << Eq.Gett_start() << " - начало отрезка по t" << endl;
+			cout << "T = " << Eq.Gett_finish() << " - конец отрезка по t" << endl;
+			cout << "h = " << Eq.Geth() << " - шаг по x" << endl;
+			cout << "tau = " << Eq.Gettau() << " - шаг по t" << endl;/*
 			cout << "Матрица прогонки для последнего посчитанного слоя" << endl;
 			Eq.PrintMatrix();*/
 		}
 
 		if (com == "solve") {
+			ofstream out;
+			out.open("HeatSourcesInTime.txt", std::ios::app);
+			double heat_density;
+			double time;
+			Eq.ReCreate();
 			Eq.ZeroLayer();
+			Eq.TempCheckToFile();
 			Eq.PrintLastLayerToFile();
+			heat_density = Eq.HeatSource(0);
+			if (heat_density < 0) {
+				out << "t = " << 0 <<" Плотность стоков тепла: " << heat_density << endl;
+			}
+			else {
+				if (heat_density > 0) {
+					out << "t = " << 0 << "Плотность источников тепла: " << heat_density << endl;
+				}
+				else {
+					out << "t = " << 0 << "Источников (стоков) тепла нет" << endl;
+				}
+			}
 			for (int i = 1; i <= Eq.Getm(); i++) {
 				Eq.NextLayer();
+				Eq.TempCheckToFile();
 				Eq.PrintLastLayerToFile();
+				time = Eq.Gett_start() + Eq.Gettau() * Eq.Getlayer_counter();
+				heat_density = Eq.HeatSource(time);
+				if (heat_density < 0) {
+					out << "t = " << time << " Плотность стоков тепла: " << heat_density << endl;
+				}
+				else {
+					if (heat_density > 0) {
+						out << "t = " << time << " Плотность источников тепла: " << heat_density << endl;
+					}
+					else {
+						out << "t = " << time << " Источников (стоков) тепла нет" << endl;
+					}
+				}
 			}
+			out.close();
 		}
 
 		if (com == "temp") {
@@ -160,19 +200,44 @@ void Menu(HeatEq Eq) {
 		}
 
 		if (com == "layer") {
-			int num;
+			int num, res;
 			cout << "Введите номер слоя от 0 до " << Eq.Getm() << ": ";
 			cin >> num;
-			Eq.ZeroLayer();
 			if (num == 0) {
-				Eq.PrintLastLayer();
+				res = Eq.CheckedZeroLayer();
+				if (res != -1) {
+					Eq.PrintLastLayer();
+				}
 			}
 			else {
-				for (int i = 1; i <= num; i++) {
+				Eq.ZeroLayer();
+				for (int i = 1; i < num; i++) {
 					Eq.NextLayer();
 					//cout << "Посчитал " << layer_counter << " слой" << endl;
 				}
-				Eq.PrintLastLayer();
+				res = Eq.CheckedNextLayer();
+				if (res != -1) {
+					Eq.PrintLastLayer();
+				}
+			}
+		}
+
+		if (com == "heatsource") {
+			double heat_density;
+			double time;
+			cout << "Введите время: t = ";
+			cin >> time;
+			heat_density = Eq.HeatSource(time);
+			if (heat_density < 0) {
+				cout << "Плотность стоков тепла: " << heat_density << endl;
+			}
+			else {
+				if (heat_density > 0) {
+					cout << "Плотность источников тепла: " << heat_density << endl;
+				}
+				else {
+					cout << "Источников (стоков) тепла нет" << endl;
+				}
 			}
 		}
 
@@ -183,6 +248,7 @@ void Menu(HeatEq Eq) {
 			cout << "solve - узнать температуру во всех узлах сетки (только после initial)" << endl;
 			cout << "temp - узнать температуру в конкретной точке" << endl;
 			cout << "layer - вывести на экран какой-то слой (только после initial)" << endl;
+			cout << "heatsource - вывести на экран плотность источников (стоков) тепла в момент времени t (только после initial)" << endl;
 			cout << "h - узнать шаг h по x" << endl;
 			cout << "tau - узнать шаг tau по t" << endl;
 			cout << "n - узнать количество узлов n по x" << endl;
