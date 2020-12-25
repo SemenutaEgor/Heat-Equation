@@ -63,8 +63,8 @@ void Menu(HeatEq Eq) {
 			cout << "T = " << Eq.Gett_finish() << " - конец отрезка по t" << endl;
 			cout << "h = " << Eq.Geth() << " - шаг по x" << endl;
 			cout << "tau = " << Eq.Gettau() << " - шаг по t" << endl;
-			cout << "Порядок аппроксимации схемы O(tau + h^2): O(" << Eq.Gettau() + pow(Eq.Geth(), 2) << ")" << endl;
-			cout << "Порядок сходимости схемы O(tau + h^2): O(" << Eq.Gettau() + pow(Eq.Geth(), 2) << ")" << endl;
+			cout << "Порядок аппроксимации схемы O(tau + h^2): "  << Eq.Gettau() + pow(Eq.Geth(), 2) << endl;
+			cout << "Порядок сходимости схемы O(tau + h^2): "<< Eq.Gettau() + pow(Eq.Geth(), 2) << endl;
 			cout << "Сходимость абсолютная" << endl;
 			cout << "Оценка погрешности М*(tau + h^2): M*" << Eq.Gettau() + pow(Eq.Geth(), 2) << ", M - константа, не зависит от h и tau " << endl;
 			/*cout << "Матрица прогонки для последнего посчитанного слоя" << endl;
@@ -348,4 +348,8 @@ int main() {
 	//cout << "it is a " << E1.Getlayer_counter() << " layer:" << endl;
 	//E1.PrintLastLayer();
 
+
+	//Что можно сделать потом:
+	//Сравнивать средние температуры в общих узлах двух сеток (одна менее густая, втораа более густая) и выводить максимум разницы
+	//(Максимум разности средних температур)
 }
