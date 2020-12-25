@@ -362,7 +362,7 @@ void HeatEq::AverageTemperatureOnLayer() {
 		temperature += layer[i];
 	}
 	average_temperature = temperature / n;
-	out << "Средняя температура на слое " << layer_counter << " = "<< average_temperature << endl;
+	out << "Средняя температура во время t =  " << layer_counter*tau << ":    "<< average_temperature << endl;
 	out.close();
 }
 
