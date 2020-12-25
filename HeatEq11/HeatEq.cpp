@@ -54,6 +54,36 @@ HeatEq::HeatEq(int n, int m) {
 
 }
 
+void HeatEq::ReCreateIrreg() {
+	this->h = h;
+	this->tau = tau;
+	this->x_start = 0;
+	this->x_finish = 1;
+	this->t_start = 0;
+	this->t_finish = 1000;
+
+	this->n = 1 + (x_finish - x_start) / h;
+	this->m = 1 + (t_finish - t_start) / tau;
+
+	this->h = (x_finish - x_start) / n;
+	this->tau = (t_finish - t_start) / m;
+
+	this->A = (9.0 * tau) / pow(h, 2);
+	this->B = (9.0 * tau) / pow(h, 2);
+	this->C = 1.0 + (18.0 * tau) / pow(h, 2);
+	this->kappa1 = 1.0;
+	this->kappa2 = 1.0 / (1.0 + 7.0 * h);
+	this->mu1 = 0;
+	this->mu2 = (2 * h) / (1.0 + 7.0 * h);
+	this->phi_arr = new double[n - 2];
+	this->TMsolutions = new double[n];
+
+	this->layer = new double[n + 1];
+	this->layer_counter = 0;
+
+}
+
+
 void HeatEq::ReCreate() {
 	h = (x_finish - x_start) / n;
 	tau = (t_finish - t_start) / m;

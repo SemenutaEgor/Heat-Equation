@@ -42,10 +42,14 @@ void Menu(HeatEq Eq) {
 		if (com == "info") {
 			cout << "Вариант 4" << endl;
 			cout << "Уравнение тепопроводности: du/dt = 9 * d^2u/dx^2 + 5*sin(t)" << endl;
-			cout << "x принадлежит отрезку [0,1], t принадлежит отрезку [0, 1000]" << endl;
+			cout << "9 - коэффициент температуророводности в квадрате" << endl;
+			cout << "5*sin(t) - плотность внутренних тепловых истоников (стоков)" << endl;
 			cout << "Начальные условия: u(x, 0) = 1 - x^2" << endl;
+			cout << "Задают температуту стержня в точке x в момент времени 0" << endl;
 			cout << "Граничные условия слева (второго рода): du/dx(0, t) = 0" << endl;
+			cout << "Задают тепловой поток на левом торце стержня в любой момент времени (левый торец заизолирован)" << endl;
 			cout << "Граничные условия справа (третьего рода): -du/dx(1, t) = 7 * (u(1, t) - 2/7)" << endl;
+			cout << "Задают теплообмен с окружающей средой через правый торец стержня в любой момент времени" << endl;
 			cout << "Неявная разностная схема:" << endl;
 			cout << "(9*tau/h^2) * v[i-1, j+1] + (9*tau/h^2) * v[i+1, j+1] - (1 + 18*tau/h^2) * v[i, j+1] = - (5*tau*sin(t) + v[i, j])" << endl;
 			cout << "i = 1, ... , n-1;     j = 1, ..., m" << endl;
@@ -58,8 +62,12 @@ void Menu(HeatEq Eq) {
 			cout << "t0 = " << Eq.Gett_start() << " - начало отрезка по t" << endl;
 			cout << "T = " << Eq.Gett_finish() << " - конец отрезка по t" << endl;
 			cout << "h = " << Eq.Geth() << " - шаг по x" << endl;
-			cout << "tau = " << Eq.Gettau() << " - шаг по t" << endl;/*
-			cout << "Матрица прогонки для последнего посчитанного слоя" << endl;
+			cout << "tau = " << Eq.Gettau() << " - шаг по t" << endl;
+			cout << "Порядок аппроксимации схемы O(tau + h^2): O(" << Eq.Gettau() + pow(Eq.Geth(), 2) << ")" << endl;
+			cout << "Порядок сходимости схемы O(tau + h^2): O(" << Eq.Gettau() + pow(Eq.Geth(), 2) << ")" << endl;
+			cout << "Сходимость абсолютная" << endl;
+			cout << "Оценка погрешности М*(tau + h^2): M*" << Eq.Gettau() + pow(Eq.Geth(), 2) << ", M - константа, не зависит от h и tau " << endl;
+			/*cout << "Матрица прогонки для последнего посчитанного слоя" << endl;
 			Eq.PrintMatrix();*/
 		}
 
@@ -74,14 +82,14 @@ void Menu(HeatEq Eq) {
 			Eq.PrintLastLayerToFile();
 			heat_density = Eq.HeatSource(0);
 			if (heat_density < 0) {
-				out << "t = " << 0 <<" Плотность стоков тепла: " << heat_density << endl;
+				out << "t = " << 0 <<" Плотность внутренних стоков тепла: " << heat_density << endl;
 			}
 			else {
 				if (heat_density > 0) {
-					out << "t = " << 0 << "Плотность источников тепла: " << heat_density << endl;
+					out << "t = " << 0 << "Плотность внутренних источников тепла: " << heat_density << endl;
 				}
 				else {
-					out << "t = " << 0 << "Источников (стоков) тепла нет" << endl;
+					out << "t = " << 0 << " Внутренних источников (стоков) тепла нет" << endl;
 				}
 			}
 			for (int i = 1; i <= Eq.Getm(); i++) {
@@ -91,14 +99,14 @@ void Menu(HeatEq Eq) {
 				time = Eq.Gett_start() + Eq.Gettau() * Eq.Getlayer_counter();
 				heat_density = Eq.HeatSource(time);
 				if (heat_density < 0) {
-					out << "t = " << time << " Плотность стоков тепла: " << heat_density << endl;
+					out << "t = " << time << " Плотность внутренних стоков тепла: " << heat_density << endl;
 				}
 				else {
 					if (heat_density > 0) {
-						out << "t = " << time << " Плотность источников тепла: " << heat_density << endl;
+						out << "t = " << time << " Плотность внутренних источников тепла: " << heat_density << endl;
 					}
 					else {
-						out << "t = " << time << " Источников (стоков) тепла нет" << endl;
+						out << "t = " << time << " Внутренних источников (стоков) тепла нет" << endl;
 					}
 				}
 			}
@@ -241,20 +249,55 @@ void Menu(HeatEq Eq) {
 			}
 		}
 
+		if (com == "concretion") {
+			int order;
+			cout << "Оценка погрешности М*(tau + h^2): M*" << Eq.Gettau() + pow(Eq.Geth(), 2) << ", M - константа, не зависит от h и tau " << endl;
+			cout << "Во сколько раз надо увеличить точность? (уменьшить оценку погрешности) ";
+			cin >> order;
+			cout << "Шаг h тогда уменьшим в " << sqrt(order) << " раз" << endl;
+			cout << "A шаг tau уменьшим в " << order << " раз" << endl;
+			
+			double h, tau;
+			h = Eq.Geth() / sqrt(order);
+			tau = Eq.Gettau() / order;
+
+			Eq.Seth(h);
+			Eq.Settau(tau);
+
+			cout << "Оценка погрешности М*(tau + h^2) теперь такая: M*" << Eq.Gettau() + pow(Eq.Geth(), 2) << ", M - константа, не зависит от h и tau " << endl;
+			
+			cout << "h = " << Eq.Geth() << endl;
+			cout << "tau = " << Eq.Gettau() << endl;
+
+			Eq.ReCreateIrreg();
+
+			cout << "Примерное разбиение для этой точности будет такое:"<< endl;
+
+			cout << "n = " << Eq.Getn() << endl;
+			cout << "m = " << Eq.Getm() << endl;
+
+			cout << "Соответствующие шаги такие:" << endl;
+
+			cout << "h = " << Eq.Geth() << endl;
+			cout << "tau = " << Eq.Gettau() << endl;
+		}
+
+
 		if (com == "help") {
 			cout << endl;
-			cout << "initial - ввод новых параметров для уравнения" << endl;
-			cout << "info - узнать все параметры" << endl;
-			cout << "solve - узнать температуру во всех узлах сетки (только после initial)" << endl;
-			cout << "temp - узнать температуру в конкретной точке" << endl;
-			cout << "layer - вывести на экран какой-то слой (только после initial)" << endl;
-			cout << "heatsource - вывести на экран плотность источников (стоков) тепла в момент времени t (только после initial)" << endl;
-			cout << "h - узнать шаг h по x" << endl;
-			cout << "tau - узнать шаг tau по t" << endl;
-			cout << "n - узнать количество узлов n по x" << endl;
-			cout << "m - узнать количество узлов m по t" << endl;/*
-			cout << "matrix - напечатать матрицу прогонки (для последнего посчитанного слоя)" << endl;*/
-			cout << "exit - exit" << endl;
+			cout << "Ввод новых параметров для уравнения                           " << ": initial" << endl;
+			cout << "Информация о задаче                                           " << ": info" << endl;
+			cout << "Узнать температуру во всех узлах сетки                        " << ": solve" << " (только после initial)" <<endl;
+			cout << "Узнать температуру в конкретной точке                         " << ": temp" << endl;
+			cout << "Вывести какой-то слой                                         " << ": layer" << " (только после initial)" << endl;
+			cout << "Вывести плотность источников (стоков) тепла в момент времени t" << ": heatsourse" << " (только после initial)" << endl;
+			cout << "Увеличить точность (уменьшить оценку погрешности)             " << ": concretion" << " (только после initial)" << endl;
+			cout << "Узнать шаг h по x                                             " << ": h" << endl;
+			cout << "Узнать шаг tau по t                                           " << ": tau" << endl;
+			cout << "Узнать количество узлов n по x                                " << ": n" << endl;
+			cout << "Узнать количество узлов m по t                                " << ": m" << endl;
+			//cout << "matrix - напечатать матрицу прогонки (для последнего посчитанного слоя)" << endl;
+			cout << "Выход                                                         " << ": exit" << endl;
 		}
 	} while (com != "exit");
 }

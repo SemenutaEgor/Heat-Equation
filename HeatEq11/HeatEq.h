@@ -47,7 +47,9 @@ public:
 
 	HeatEq();
 	HeatEq(int n, int m);
+	HeatEq(double h, double tau);
 	void ReCreate();
+	void ReCreateIrreg();
 
 	//Set&Get methods
 	double Getx_start();
@@ -75,6 +77,8 @@ public:
 	void Setm(int val) { m = val; }
 	void Setmin_temp(double val) { min_temp = val; }
 	void Setmax_temp(double val) { max_temp = val; }
+	void Seth(double val) { h = val; }
+	void Settau(double val) { tau = val; }
 
 	//Tridiagonal matrix algorithm
 	void TridiagMatrix(double* A_arr, double* B_arr, double* C_arr, double kappa1, double kappa2, 
